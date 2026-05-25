@@ -102,15 +102,11 @@ public class CourseController {
     /** TEACHER (own course) or ADMIN — list enrolled students with progress %. */
     @GetMapping("/{id}/students")
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
-    public ResponseEntity<List<StudentWithProgressResponse>> students(
-            @PathVariable Long id,
-            Authentication authentication
-    ) {
+    public ResponseEntity<List<StudentWithProgressResponse>> students(@PathVariable Long id, Authentication authentication) {
         User currentUser = requireUser(authentication);
         return ResponseEntity.ok(courseService.getStudentsWithProgress(id, currentUser));
     }
 
-    // ──────────────────────────────────────────────────────────────
     private User extractUser(Authentication auth) {
         if (auth != null && auth.getPrincipal() instanceof User u) return u;
         return null;

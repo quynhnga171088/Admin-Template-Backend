@@ -21,6 +21,7 @@ public class ProgressService {
     private final LessonRepository         lessonRepository;
     private final LessonProgressRepository lessonProgressRepository;
     private final EnrollmentRepository     enrollmentRepository;
+    private final ChapterRepository        chapterRepository;
     private final CourseService            courseService;
     private final SystemConfigService      systemConfigService;
 
@@ -33,7 +34,8 @@ public class ProgressService {
         Course course = courseService.getCourseOrThrow(courseId);
         requireApprovedEnrollment(student, course);
 
-        List<Lesson> lessons = lessonRepository.findAllByCourseOrderByOrderIndexAsc(course);
+        List<Chapter> chapters = chapterRepository.findAllByCourseOrderByOrderIndexAsc(course);
+        List<Lesson> lessons = lessonRepository.findAllByChapterIn(chapters);
 
         // Fetch all progress records for this student + course in one query
         Map<Long, LessonProgress> progressMap = lessonProgressRepository
@@ -76,7 +78,7 @@ public class ProgressService {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson", lessonId));
 
-        requireApprovedEnrollment(student, lesson.getCourse());
+        requireApprovedEnrollment(student, lesson.getChapter().getCourse());
 
         LessonProgress progress = getOrCreateProgress(student, lesson);
         progress.setLastAccessedAt(LocalDateTime.now());
@@ -115,7 +117,7 @@ public class ProgressService {
             throw new IllegalArgumentException("Lesson is not a video lesson");
         }
 
-        requireApprovedEnrollment(student, lesson.getCourse());
+        requireApprovedEnrollment(student, lesson.getChapter().getCourse());
 
         LessonProgress progress = getOrCreateProgress(student, lesson);
         progress.setLastAccessedAt(LocalDateTime.now());
@@ -160,7 +162,7 @@ public class ProgressService {
                 .orElseGet(() -> LessonProgress.builder()
                         .student(student)
                         .lesson(lesson)
-                        .course(lesson.getCourse())
+                        .course(lesson.getChapter().getCourse())
                         .status(LessonProgress.Status.NOT_STARTED)
                         .videoWatchedSeconds(0)
                         .videoMaxWatchedPercent(0.0)

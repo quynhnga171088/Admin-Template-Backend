@@ -20,13 +20,16 @@ public class AttachmentService {
     private final LessonAttachmentRepository attachmentRepository;
     private final EnrollmentRepository       enrollmentRepository;
     private final LessonService              lessonService;
+    private final ChapterService             chapterService;
     private final CourseService              courseService;
     private final FileStorageService         fileStorageService;
 
     @Transactional(readOnly = true)
-    public List<AttachmentResponse> listAttachments(Long courseId, Long lessonId, User currentUser) {
-        Course course = courseService.getCourseOrThrow(courseId);
-        Lesson lesson = lessonService.getLessonOrThrow(lessonId, course);
+    public List<AttachmentResponse> listAttachments(Long courseId, Long chapterId,
+                                                    Long lessonId, User currentUser) {
+        Course course   = courseService.getCourseOrThrow(courseId);
+        Chapter chapter = chapterService.getChapterOrThrow(chapterId, course);
+        Lesson lesson   = lessonService.getLessonOrThrow(lessonId, chapter);
 
         requireReadAccess(course, currentUser);
 
@@ -37,9 +40,11 @@ public class AttachmentService {
     }
 
     @Transactional
-    public AttachmentResponse addAttachment(Long courseId, Long lessonId, MultipartFile file, User teacher) {
-        Course course = courseService.getCourseOrThrow(courseId);
-        Lesson lesson = lessonService.getLessonOrThrow(lessonId, course);
+    public AttachmentResponse addAttachment(Long courseId, Long chapterId,
+                                            Long lessonId, MultipartFile file, User teacher) {
+        Course course   = courseService.getCourseOrThrow(courseId);
+        Chapter chapter = chapterService.getChapterOrThrow(chapterId, course);
+        Lesson lesson   = lessonService.getLessonOrThrow(lessonId, chapter);
         requireTeacherAccess(course, teacher);
 
         UploadResponse upload = fileStorageService.storeDocument(file, lessonId);
@@ -60,9 +65,11 @@ public class AttachmentService {
     }
 
     @Transactional
-    public void deleteAttachment(Long courseId, Long lessonId, Long attachmentId, User teacher) {
-        Course course = courseService.getCourseOrThrow(courseId);
-        Lesson lesson = lessonService.getLessonOrThrow(lessonId, course);
+    public void deleteAttachment(Long courseId, Long chapterId,
+                                 Long lessonId, Long attachmentId, User teacher) {
+        Course course   = courseService.getCourseOrThrow(courseId);
+        Chapter chapter = chapterService.getChapterOrThrow(chapterId, course);
+        Lesson lesson   = lessonService.getLessonOrThrow(lessonId, chapter);
         requireTeacherAccess(course, teacher);
 
         LessonAttachment att = attachmentRepository.findById(attachmentId)
@@ -87,7 +94,8 @@ public class AttachmentService {
 
     private void requireTeacherAccess(Course course, User user) {
         if (user.getRole() == User.Role.ADMIN) return;
-        if (user.getRole() == User.Role.TEACHER && course.getTeacher().getId().equals(user.getId())) return;
+        if (user.getRole() == User.Role.TEACHER
+                && course.getTeacher().getId().equals(user.getId())) return;
         throw new SecurityException("Access denied: you do not own this course");
     }
 }

@@ -1,0 +1,4 @@
+com\lms\dto\chapter\ChapterResponse$ChapterResponseBuilder.class
+com\lms\entity\Chapter.class
+com\lms\dto\chapter\ChapterResponse.class
+com\lms\entity\Chapter$ChapterBuilder.class

@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class LessonDetailResponse {
     private Long id;
-    private Long courseId;
+    private Long chapterId;
     private String title;
     private String description;
     private Integer orderIndex;
@@ -34,7 +34,7 @@ public class LessonDetailResponse {
     public static LessonDetailResponse fromEntity(Lesson l, List<AttachmentResponse> attachments) {
         return LessonDetailResponse.builder()
                 .id(l.getId())
-                .courseId(l.getCourse().getId())
+                .chapterId(l.getChapter().getId())
                 .title(l.getTitle())
                 .description(l.getDescription())
                 .orderIndex(l.getOrderIndex())

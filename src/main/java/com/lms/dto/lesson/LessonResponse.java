@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class LessonResponse {
     private Long id;
+    private Long chapterId;
     private String title;
     private String description;
     private Integer orderIndex;
@@ -35,6 +36,7 @@ public class LessonResponse {
     public static LessonResponse fromEntityFull(Lesson l) {
         return LessonResponse.builder()
                 .id(l.getId())
+                .chapterId(l.getChapter().getId())
                 .title(l.getTitle())
                 .description(l.getDescription())
                 .orderIndex(l.getOrderIndex())

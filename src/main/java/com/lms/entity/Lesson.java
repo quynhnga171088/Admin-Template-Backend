@@ -35,8 +35,8 @@ public class Lesson {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id", nullable = false)
-    private Course course;
+    @JoinColumn(name = "chapter_id", nullable = false)
+    private Chapter chapter;
 
     @Column(nullable = false, length = 255)
     private String title;

@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/courses/{courseId}/lessons/{lessonId}/attachments")
+@RequestMapping("/courses/{courseId}/chapters/{chapterId}/lessons/{lessonId}/attachments")
 @RequiredArgsConstructor
 public class AttachmentController {
 
@@ -23,11 +23,12 @@ public class AttachmentController {
     @GetMapping
     public ResponseEntity<List<AttachmentResponse>> list(
             @PathVariable Long courseId,
+            @PathVariable Long chapterId,
             @PathVariable Long lessonId,
             Authentication authentication
     ) {
         User currentUser = requireUser(authentication);
-        return ResponseEntity.ok(attachmentService.listAttachments(courseId, lessonId, currentUser));
+        return ResponseEntity.ok(attachmentService.listAttachments(courseId, chapterId, lessonId, currentUser));
     }
 
     /** TEACHER (own course) or ADMIN — upload a document attachment (multipart). */
@@ -35,13 +36,14 @@ public class AttachmentController {
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
     public ResponseEntity<AttachmentResponse> upload(
             @PathVariable Long courseId,
+            @PathVariable Long chapterId,
             @PathVariable Long lessonId,
             @RequestParam("file") MultipartFile file,
             Authentication authentication
     ) {
         User teacher = requireUser(authentication);
         if (file.isEmpty()) throw new IllegalArgumentException("File is empty");
-        AttachmentResponse result = attachmentService.addAttachment(courseId, lessonId, file, teacher);
+        AttachmentResponse result = attachmentService.addAttachment(courseId, chapterId, lessonId, file, teacher);
         return ResponseEntity.ok(result);
     }
 
@@ -50,12 +52,13 @@ public class AttachmentController {
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
     public ResponseEntity<Void> delete(
             @PathVariable Long courseId,
+            @PathVariable Long chapterId,
             @PathVariable Long lessonId,
             @PathVariable Long attachmentId,
             Authentication authentication
     ) {
         User teacher = requireUser(authentication);
-        attachmentService.deleteAttachment(courseId, lessonId, attachmentId, teacher);
+        attachmentService.deleteAttachment(courseId, chapterId, lessonId, attachmentId, teacher);
         return ResponseEntity.noContent().build();
     }
 

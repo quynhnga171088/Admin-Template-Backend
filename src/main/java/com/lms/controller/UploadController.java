@@ -41,11 +41,7 @@ public class UploadController {
      * @param type  One of: avatar | thumbnail | receipt
      */
     @PostMapping("/image")
-    public ResponseEntity<UploadResponse> uploadImage(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "type", defaultValue = "avatar") String type,
-            Authentication authentication
-    ) {
+    public ResponseEntity<UploadResponse> uploadImage(@RequestParam("file") MultipartFile file, @RequestParam(value = "type", defaultValue = "avatar") String type, Authentication authentication) {
         requireUser(authentication);
         if (file.isEmpty()) throw new IllegalArgumentException("File is empty");
         UploadResponse result = fileStorageService.storeImage(file, type);
