@@ -29,6 +29,12 @@ public class Chapter {
     @Column(nullable = false, length = 255)
     private String title;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "avatar_url", length = 2000)
+    private String avatarUrl;
+
     @Column(name = "order_index", nullable = false)
     @Builder.Default
     private Integer orderIndex = 0;

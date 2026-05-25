@@ -62,6 +62,8 @@ public class ChapterService {
         Chapter chapter = Chapter.builder()
                 .course(course)
                 .title(req.getTitle())
+                .description(req.getDescription())
+                .avatarUrl(req.getAvatarUrl())
                 .orderIndex(nextOrder)
                 .build();
 
@@ -75,7 +77,9 @@ public class ChapterService {
         Chapter chapter = getChapterOrThrow(chapterId, course);
         checkTeacherWriteAccess(course, teacher);
 
-        if (req.getTitle() != null) chapter.setTitle(req.getTitle());
+        if (req.getTitle() != null)       chapter.setTitle(req.getTitle());
+        if (req.getDescription() != null) chapter.setDescription(req.getDescription());
+        if (req.getAvatarUrl() != null)   chapter.setAvatarUrl(req.getAvatarUrl());
 
         return ChapterResponse.fromEntity(chapterRepository.save(chapter));
     }

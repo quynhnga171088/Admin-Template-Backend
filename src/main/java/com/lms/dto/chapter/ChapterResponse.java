@@ -19,6 +19,8 @@ public class ChapterResponse {
     private Long id;
     private Long courseId;
     private String title;
+    private String description;
+    private String avatarUrl;
     private Integer orderIndex;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -31,6 +33,8 @@ public class ChapterResponse {
                 .id(c.getId())
                 .courseId(c.getCourse().getId())
                 .title(c.getTitle())
+                .description(c.getDescription())
+                .avatarUrl(c.getAvatarUrl())
                 .orderIndex(c.getOrderIndex())
                 .createdAt(c.getCreatedAt())
                 .updatedAt(c.getUpdatedAt())
