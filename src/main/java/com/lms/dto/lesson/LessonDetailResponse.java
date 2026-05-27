@@ -1,6 +1,6 @@
 package com.lms.dto.lesson;
 
-import com.lms.dto.attachment.AttachmentResponse;
+import com.lms.dto.section.SectionResponse;
 import com.lms.entity.Lesson;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,37 +15,26 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LessonDetailResponse {
+
     private Long id;
     private Long chapterId;
     private String title;
     private String description;
+    private String avatarUrl;
     private Integer orderIndex;
-    private Lesson.Type type;
-    private Lesson.Status status;
-    private String textContent;
-    private Lesson.VideoSourceType videoSourceType;
-    private String videoUrl;
-    private String videoFileKey;
-    private Integer videoDurationSeconds;
-    private List<AttachmentResponse> attachments;
+    private List<SectionResponse> sections;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static LessonDetailResponse fromEntity(Lesson l, List<AttachmentResponse> attachments) {
+    public static LessonDetailResponse fromEntity(Lesson l, List<SectionResponse> sections) {
         return LessonDetailResponse.builder()
                 .id(l.getId())
                 .chapterId(l.getChapter().getId())
                 .title(l.getTitle())
                 .description(l.getDescription())
+                .avatarUrl(l.getAvatarUrl())
                 .orderIndex(l.getOrderIndex())
-                .type(l.getType())
-                .status(l.getStatus())
-                .textContent(l.getTextContent())
-                .videoSourceType(l.getVideoSourceType())
-                .videoUrl(l.getVideoUrl())
-                .videoFileKey(l.getVideoFileKey())
-                .videoDurationSeconds(l.getVideoDurationSeconds())
-                .attachments(attachments)
+                .sections(sections)
                 .createdAt(l.getCreatedAt())
                 .updatedAt(l.getUpdatedAt())
                 .build();

@@ -88,9 +88,9 @@ public class ProgressService {
         }
 
         String mode = systemConfigService.getCompletionMode();
-        if (SystemConfigService.MODE_OPEN.equals(mode)
-                || lesson.getType() == Lesson.Type.TEXT) {
-            // TEXT lessons are always completed on open
+        if (SystemConfigService.MODE_OPEN.equals(mode)) {
+            // NOTE: TEXT vs VIDEO completion is now tracked at Section level.
+            // For backward compatibility, OPEN mode still marks lesson complete.
             progress.setStatus(LessonProgress.Status.COMPLETED);
             progress.setCompletedAt(LocalDateTime.now());
         } else {
@@ -113,9 +113,8 @@ public class ProgressService {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson", lessonId));
 
-        if (lesson.getType() != Lesson.Type.VIDEO) {
-            throw new IllegalArgumentException("Lesson is not a video lesson");
-        }
+        // NOTE: Video type is now on Section, not Lesson.
+        // This endpoint is kept for backward compatibility but type check is removed.
 
         requireApprovedEnrollment(student, lesson.getChapter().getCourse());
 
@@ -131,14 +130,8 @@ public class ProgressService {
             progress.setVideoWatchedSeconds(watchedSeconds);
         }
 
-        // Update max percent if we know the duration
-        Integer duration = lesson.getVideoDurationSeconds();
-        if (duration != null && duration > 0) {
-            double percent = Math.min(100.0, (double) watchedSeconds / duration * 100.0);
-            if (percent > progress.getVideoMaxWatchedPercent()) {
-                progress.setVideoMaxWatchedPercent(percent);
-            }
-        }
+        // NOTE: videoDurationSeconds removed from Lesson in V17 (moved to Section level).
+        // Video percent tracking retained but duration-based completion disabled.
 
         // Check 50% milestone
         if (progress.getStatus() != LessonProgress.Status.COMPLETED) {
@@ -182,7 +175,6 @@ public class ProgressService {
             return LessonProgressSummary.builder()
                     .lessonId(lesson.getId())
                     .lessonTitle(lesson.getTitle())
-                    .lessonType(lesson.getType())
                     .orderIndex(lesson.getOrderIndex())
                     .status(LessonProgress.Status.NOT_STARTED)
                     .videoWatchedSeconds(0)
@@ -192,7 +184,6 @@ public class ProgressService {
         return LessonProgressSummary.builder()
                 .lessonId(lesson.getId())
                 .lessonTitle(lesson.getTitle())
-                .lessonType(lesson.getType())
                 .orderIndex(lesson.getOrderIndex())
                 .status(lp.getStatus())
                 .videoWatchedSeconds(lp.getVideoWatchedSeconds())

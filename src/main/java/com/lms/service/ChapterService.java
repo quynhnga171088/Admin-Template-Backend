@@ -2,6 +2,7 @@ package com.lms.service;
 
 import com.lms.dto.chapter.*;
 import com.lms.dto.lesson.LessonResponse;
+import com.lms.dto.section.SectionResponse;
 import com.lms.entity.*;
 import com.lms.exception.ResourceNotFoundException;
 import com.lms.repository.*;
@@ -21,6 +22,7 @@ public class ChapterService {
 
     private final ChapterRepository chapterRepository;
     private final LessonRepository  lessonRepository;
+    private final SectionRepository sectionRepository;
     private final CourseService     courseService;
 
     // ──────────────────────────────────────────────────────────────
@@ -28,8 +30,7 @@ public class ChapterService {
     // ──────────────────────────────────────────────────────────────
 
     /**
-     * Lists all chapters of a course, with lessons nested inside each chapter.
-     * Access-aware: unauthenticated/unenrolled users get lesson preview only.
+     * Lists all chapters of a course, with lessons and nested sections inside each chapter.
      */
     @Transactional(readOnly = true)
     public List<ChapterResponse> listChapters(Long courseId, User currentUser, boolean fullAccess) {
@@ -40,9 +41,14 @@ public class ChapterService {
             List<LessonResponse> lessons = lessonRepository
                     .findAllByChapterOrderByOrderIndexAsc(chapter)
                     .stream()
-                    .map(l -> fullAccess
-                            ? LessonResponse.fromEntityFull(l)
-                            : LessonResponse.fromEntityPreview(l))
+                    .map(lesson -> {
+                        List<SectionResponse> sections = sectionRepository
+                                .findAllByLessonOrderByOrderIndexAsc(lesson)
+                                .stream()
+                                .map(SectionResponse::fromEntity)
+                                .toList();
+                        return LessonResponse.fromEntity(lesson, sections);
+                    })
                     .toList();
             return ChapterResponse.fromEntity(chapter, lessons);
         }).toList();
@@ -90,10 +96,16 @@ public class ChapterService {
         Chapter chapter = getChapterOrThrow(chapterId, course);
         checkTeacherWriteAccess(course, teacher);
 
-        // Soft-delete all lessons inside this chapter first
-        List<Lesson> lessons = lessonRepository.findAllByChapterOrderByOrderIndexAsc(chapter);
         LocalDateTime now = LocalDateTime.now();
-        lessons.forEach(l -> l.setDeletedAt(now));
+
+        // Soft-delete all lessons and their sections inside this chapter
+        List<Lesson> lessons = lessonRepository.findAllByChapterOrderByOrderIndexAsc(chapter);
+        for (Lesson lesson : lessons) {
+            List<Section> sections = sectionRepository.findAllByLessonOrderByOrderIndexAsc(lesson);
+            sections.forEach(s -> s.setDeletedAt(now));
+            sectionRepository.saveAll(sections);
+            lesson.setDeletedAt(now);
+        }
         lessonRepository.saveAll(lessons);
 
         // Soft-delete the chapter itself

@@ -67,10 +67,9 @@ public class CourseService {
         Course course = resolveCourse(slugOrId);
         List<Lesson> lessons = lessonRepository.findAllByCourseOrderByOrderIndexAsc(course);
 
-        boolean fullAccess = hasFullLessonAccess(course, currentUser);
 
         List<LessonResponse> lessonResponses = lessons.stream()
-                .map(l -> fullAccess ? LessonResponse.fromEntityFull(l) : LessonResponse.fromEntityPreview(l))
+                .map(LessonResponse::fromEntity)
                 .toList();
 
         Enrollment.Status enrollmentStatus = null;

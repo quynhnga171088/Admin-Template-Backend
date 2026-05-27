@@ -1,6 +1,5 @@
 package com.lms.dto.progress;
 
-import com.lms.entity.Lesson;
 import com.lms.entity.LessonProgress;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
 public class LessonProgressSummary {
     private Long lessonId;
     private String lessonTitle;
-    private Lesson.Type lessonType;
+    // NOTE: Lesson.Type removed in V17 migration. Type is now on Section level.
     private Integer orderIndex;
     private LessonProgress.Status status;
     private Integer videoWatchedSeconds;

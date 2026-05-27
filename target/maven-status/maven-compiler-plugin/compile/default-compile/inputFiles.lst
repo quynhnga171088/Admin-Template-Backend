@@ -1,3 +1,4 @@
+C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\service\SectionService.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\controller\AuthController.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\course\CourseDetailResponse.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\config\ConfigResponse.java
@@ -5,6 +6,7 @@ C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\report
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\controller\AttachmentController.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\service\SystemConfigService.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\security\JwtAuthenticationFilter.java
+C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\section\ReorderSectionsRequest.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\repository\ChapterRepository.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\report\StudentCourseProgress.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\entity\User.java
@@ -15,6 +17,7 @@ C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\course
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\controller\admin\ConfigController.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\repository\BankInfoRepository.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\repository\LessonProgressRepository.java
+C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\entity\Section.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\auth\RegisterRequest.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\report\StudentReportResponse.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\service\EnrollmentService.java
@@ -26,6 +29,7 @@ C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\enroll
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\service\FileStorageService.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\lesson\ReorderLessonsRequest.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\entity\Enrollment.java
+C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\section\UpdateSectionRequest.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\auth\UpdateProfileRequest.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\course\StudentWithProgressResponse.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\controller\CourseController.java
@@ -59,6 +63,7 @@ C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\admin\
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\course\CreateCourseRequest.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\config\UpdateConfigRequest.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\report\OverviewReportResponse.java
+C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\section\SectionResponse.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\config\WebMvcConfig.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\controller\EnrollmentController.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\course\CourseResponse.java
@@ -79,6 +84,7 @@ C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\upload
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\security\UserDetailsServiceImpl.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\lesson\CreateLessonRequest.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\enrollment\EnrollmentResponse.java
+C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\controller\SectionController.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\service\LessonService.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\admin\AdminUserDetailResponse.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\entity\PaymentProof.java
@@ -87,10 +93,12 @@ C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\auth\L
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\report\CourseReportResponse.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\repository\EnrollmentRepository.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\controller\admin\ReportController.java
+C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\section\CreateSectionRequest.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\controller\admin\UserController.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\exception\ApiError.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\repository\UserRepository.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\service\ProgressService.java
+C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\repository\SectionRepository.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\dto\user\UserResponse.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\service\AttachmentService.java
 C:\DOCKER\ADMIN TEMPLATE\ADMIN_TEMPLATE_BACKEND\src\main\java\com\lms\entity\BankInfo.java

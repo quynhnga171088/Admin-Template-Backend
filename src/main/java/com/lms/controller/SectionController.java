@@ -1,8 +1,8 @@
 package com.lms.controller;
 
-import com.lms.dto.lesson.*;
+import com.lms.dto.section.*;
 import com.lms.entity.User;
-import com.lms.service.LessonService;
+import com.lms.service.SectionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,66 +13,73 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/courses/{courseId}/chapters/{chapterId}/lessons")
+@RequestMapping("/courses/{courseId}/chapters/{chapterId}/lessons/{lessonId}/sections")
 @RequiredArgsConstructor
-public class LessonController {
+public class SectionController {
 
-    private final LessonService lessonService;
+    private final SectionService sectionService;
 
     /**
-     * NOTE: This mapping must come BEFORE /{lessonId} so Spring MVC matches the literal
+     * NOTE: This mapping must come BEFORE /{sectionId} so Spring MVC matches the literal
      * "reorder" segment before treating it as a path variable.
      */
     @PatchMapping("/reorder")
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
-    public ResponseEntity<List<LessonResponse>> reorder(
-            @PathVariable Long courseId,
-            @PathVariable Long chapterId,
-            @Valid @RequestBody ReorderLessonsRequest req,
-            Authentication authentication
-    ) {
-        User teacher = requireUser(authentication);
-        return ResponseEntity.ok(lessonService.reorderLessons(courseId, chapterId, req, teacher));
-    }
-
-    /** TEACHER (own course) or ADMIN. */
-    @PostMapping
-    @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
-    public ResponseEntity<LessonResponse> create(
-            @PathVariable Long courseId,
-            @PathVariable Long chapterId,
-            @Valid @RequestBody CreateLessonRequest req,
-            Authentication authentication
-    ) {
-        User teacher = requireUser(authentication);
-        return ResponseEntity.ok(lessonService.createLesson(courseId, chapterId, req, teacher));
-    }
-
-    /** TEACHER (own course) or ADMIN. */
-    @PatchMapping("/{lessonId}")
-    @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
-    public ResponseEntity<LessonResponse> update(
+    public ResponseEntity<List<SectionResponse>> reorder(
             @PathVariable Long courseId,
             @PathVariable Long chapterId,
             @PathVariable Long lessonId,
-            @Valid @RequestBody UpdateLessonRequest req,
+            @Valid @RequestBody ReorderSectionsRequest req,
             Authentication authentication
     ) {
         User teacher = requireUser(authentication);
-        return ResponseEntity.ok(lessonService.updateLesson(courseId, chapterId, lessonId, req, teacher));
+        return ResponseEntity.ok(
+                sectionService.reorderSections(courseId, chapterId, lessonId, req, teacher));
     }
 
-    /** TEACHER (own course) or ADMIN — soft delete. */
-    @DeleteMapping("/{lessonId}")
+    /** TEACHER (own course) or ADMIN — create a section. */
+    @PostMapping
+    @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
+    public ResponseEntity<SectionResponse> create(
+            @PathVariable Long courseId,
+            @PathVariable Long chapterId,
+            @PathVariable Long lessonId,
+            @Valid @RequestBody CreateSectionRequest req,
+            Authentication authentication
+    ) {
+        User teacher = requireUser(authentication);
+        return ResponseEntity.ok(
+                sectionService.createSection(courseId, chapterId, lessonId, req, teacher));
+    }
+
+    /** TEACHER (own course) or ADMIN — update a section. */
+    @PatchMapping("/{sectionId}")
+    @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
+    public ResponseEntity<SectionResponse> update(
+            @PathVariable Long courseId,
+            @PathVariable Long chapterId,
+            @PathVariable Long lessonId,
+            @PathVariable Long sectionId,
+            @Valid @RequestBody UpdateSectionRequest req,
+            Authentication authentication
+    ) {
+        User teacher = requireUser(authentication);
+        return ResponseEntity.ok(
+                sectionService.updateSection(courseId, chapterId, lessonId, sectionId, req, teacher));
+    }
+
+    /** TEACHER (own course) or ADMIN — soft delete a section. */
+    @DeleteMapping("/{sectionId}")
     @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
     public ResponseEntity<Void> delete(
             @PathVariable Long courseId,
             @PathVariable Long chapterId,
             @PathVariable Long lessonId,
+            @PathVariable Long sectionId,
             Authentication authentication
     ) {
         User teacher = requireUser(authentication);
-        lessonService.softDeleteLesson(courseId, chapterId, lessonId, teacher);
+        sectionService.softDeleteSection(courseId, chapterId, lessonId, sectionId, teacher);
         return ResponseEntity.noContent().build();
     }
 

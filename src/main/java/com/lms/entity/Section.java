@@ -9,22 +9,30 @@ import org.hibernate.annotations.Where;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "lessons")
+@Table(name = "sections")
 @Where(clause = "deleted_at IS NULL")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Lesson {
+public class Section {
+
+    public enum Type {
+        VIDEO, TEXT
+    }
+
+    public enum Status {
+        DRAFT, PUBLISHED
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chapter_id", nullable = false)
-    private Chapter chapter;
+    @JoinColumn(name = "lesson_id", nullable = false)
+    private Lesson lesson;
 
     @Column(nullable = false, length = 255)
     private String title;
@@ -32,8 +40,22 @@ public class Lesson {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "avatar_url", length = 2000)
-    private String avatarUrl;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "section_type")
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.NAMED_ENUM)
+    private Type type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "section_status")
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.NAMED_ENUM)
+    @Builder.Default
+    private Status status = Status.PUBLISHED;
+
+    @Column(name = "video_url", columnDefinition = "TEXT")
+    private String videoUrl;
+
+    @Column(name = "text_content", columnDefinition = "TEXT")
+    private String textContent;
 
     @Column(name = "order_index", nullable = false)
     @Builder.Default
