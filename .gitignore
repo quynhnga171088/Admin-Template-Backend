@@ -1,0 +1,64 @@
+# ══════════════════════════════════════════════════════════════════════════════
+#  .gitignore – Spring Boot / Maven project
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ── Maven build output ────────────────────────────────────────────────────────
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ── IntelliJ IDEA ─────────────────────────────────────────────────────────────
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# ── Eclipse ───────────────────────────────────────────────────────────────────
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# ── VS Code ───────────────────────────────────────────────────────────────────
+.vscode/
+
+# ── NetBeans ──────────────────────────────────────────────────────────────────
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ── Environment / Secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.properties.local
+application-local.yml
+application-local.yaml
+application-secret.yml
+application-secret.yaml
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+spring.log
+
+# ── OS artifacts ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Java runtime ──────────────────────────────────────────────────────────────
+hs_err_pid*
+replay_pid*
