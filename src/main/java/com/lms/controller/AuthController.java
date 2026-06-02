@@ -30,6 +30,14 @@ public class AuthController {
         return ResponseEntity.ok(res);
     }
 
+    @PostMapping("/teach/register")
+    public ResponseEntity<AuthResponse> teachRegister(@Valid @RequestBody RegisterRequest req, HttpServletRequest httpReq) {
+        String ua = httpReq.getHeader("User-Agent");
+        String ip = httpReq.getRemoteAddr();
+        AuthResponse res = authService.teachRegister(req.getEmail(), req.getPassword(), req.getFullName(), ua, ip);
+        return ResponseEntity.ok(res);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest req, HttpServletRequest httpReq) {
         String ua = httpReq.getHeader("User-Agent");

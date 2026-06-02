@@ -41,6 +41,24 @@ public class AuthService {
     }
 
     @Transactional
+    public AuthResponse teachRegister(String email, String password, String fullName, String userAgent, String ipAddress) {
+        if (userRepository.existsByEmailAndDeletedAtIsNull(email)) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        User user = User.builder()
+                .email(email.trim().toLowerCase())
+                .passwordHash(passwordEncoder.encode(password))
+                .fullName(fullName)
+                .role(User.Role.TEACHER)
+                .status(User.Status.ACTIVE)
+                .build();
+        userRepository.save(user);
+
+        return issueTokenPair(user, userAgent, ipAddress);
+    }
+
+    @Transactional
     public AuthResponse login(String email, String password, String userAgent, String ipAddress) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)

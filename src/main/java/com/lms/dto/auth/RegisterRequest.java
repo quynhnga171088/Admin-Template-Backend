@@ -11,6 +11,13 @@ public class RegisterRequest {
     @Email
     @NotBlank
     private String email;
+    
+    @NotBlank
+    @Size(max = 20)
+    private String phone;
+    
+    @Size(max = 255)
+    private String avatarUrl;
 
     @NotBlank
     @Size(min = 6, max = 100)
