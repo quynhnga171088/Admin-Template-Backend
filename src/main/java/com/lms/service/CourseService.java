@@ -46,10 +46,14 @@ public class CourseService {
      */
     @Transactional(readOnly = true)
     public Page<CourseResponse> listCourses(Course.Status status, String search, User currentUser, Pageable pageable) {
-        Page<Course> page = courseRepository.findAll(
-                CourseSpecification.withFilters(status, search, null), pageable);
+        Long authorId = null;
 
-        // Build enrollment map for authenticated students to add enrollmentStatus per course
+        if (currentUser != null && currentUser.getRole() == User.Role.TEACHER) {
+            authorId = currentUser.getId();
+        }
+        Page<Course> page = courseRepository.findAll(CourseSpecification.withFilters(status, search, authorId),
+                pageable);
+
         Map<Long, Enrollment.Status> enrollMap = buildEnrollmentMap(currentUser, page.getContent());
 
         return page.map(c -> {
