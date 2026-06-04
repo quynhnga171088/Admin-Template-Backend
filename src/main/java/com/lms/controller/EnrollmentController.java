@@ -8,6 +8,7 @@ import com.lms.entity.User;
 import com.lms.service.EnrollmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequestMapping("/enrollments")
 @RequiredArgsConstructor
@@ -37,14 +39,20 @@ public class EnrollmentController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             Authentication authentication
-    ) {
+    ) throws Exception {
         User user = requireUser(authentication);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-        if (user.getRole() == User.Role.STUDENT) {
-            return ResponseEntity.ok(enrollmentService.listForStudent(user, pageable));
-        } else {
-            return ResponseEntity.ok(enrollmentService.listForAdmin(status, courseId, studentId, pageable));
+        try {
+            if (user.getRole() == User.Role.STUDENT) {
+                return ResponseEntity.ok(enrollmentService.listForStudent(user, pageable));
+            } else {
+                return ResponseEntity.ok(enrollmentService.listForAdmin(status, courseId, studentId, pageable));
+            }
+        } catch (Exception e) {
+            log.error("[list] Exception — status={}, courseId={}, studentId={}, page={}, size={}: {} — {}",
+                    status, courseId, studentId, page, size,
+                    e.getClass().getSimpleName(), e.getMessage(), e);
+            throw e;
         }
     }
 

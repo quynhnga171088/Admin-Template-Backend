@@ -66,14 +66,11 @@ public class ReportService {
         long totalLessons = lessonRepository.countByCourse(course);
         long totalEnrollments = enrollmentRepository.countByCourse(course);
         long approvedEnrollments = enrollmentRepository
-                .findAllWithFilters(Enrollment.Status.APPROVED, courseId, null, PageRequest.of(0, 1))
-                .getTotalElements();
+                .count(EnrollmentRepository.withFilters(Enrollment.Status.APPROVED, courseId, null));
         long pendingEnrollments = enrollmentRepository
-                .findAllWithFilters(Enrollment.Status.PENDING, courseId, null, PageRequest.of(0, 1))
-                .getTotalElements();
+                .count(EnrollmentRepository.withFilters(Enrollment.Status.PENDING, courseId, null));
         long rejectedEnrollments = enrollmentRepository
-                .findAllWithFilters(Enrollment.Status.REJECTED, courseId, null, PageRequest.of(0, 1))
-                .getTotalElements();
+                .count(EnrollmentRepository.withFilters(Enrollment.Status.REJECTED, courseId, null));
 
         // Enrollment by month (last 12 months)
         LocalDateTime from = LocalDateTime.now().minusMonths(12).withDayOfMonth(1)

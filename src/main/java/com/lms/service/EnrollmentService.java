@@ -42,7 +42,8 @@ public class EnrollmentService {
     @Transactional(readOnly = true)
     public Page<EnrollmentResponse> listForAdmin(Enrollment.Status status, Long courseId,
                                                   Long studentId, Pageable pageable) {
-        return enrollmentRepository.findAllWithFilters(status, courseId, studentId, pageable)
+        return enrollmentRepository.findAll(
+                        EnrollmentRepository.withFilters(status, courseId, studentId), pageable)
                 .map(EnrollmentResponse::fromEntity);
     }
 

@@ -47,7 +47,7 @@ public class CourseService {
     @Transactional(readOnly = true)
     public Page<CourseResponse> listCourses(Course.Status status, String search, User currentUser, Pageable pageable) {
         Page<Course> page = courseRepository.findAll(
-                CourseSpecification.withFilters(status, search), pageable);
+                CourseSpecification.withFilters(status, search, null), pageable);
 
         // Build enrollment map for authenticated students to add enrollmentStatus per course
         Map<Long, Enrollment.Status> enrollMap = buildEnrollmentMap(currentUser, page.getContent());
@@ -152,8 +152,8 @@ public class CourseService {
             throw new IllegalArgumentException("Only DRAFT courses can be deleted");
         }
 
-        long enrollmentCount = enrollmentRepository.findAllWithFilters(
-                null, course.getId(), null, Pageable.unpaged()).getTotalElements();
+        long enrollmentCount = enrollmentRepository.count(
+                EnrollmentRepository.withFilters(null, course.getId(), null));
         if (enrollmentCount > 0) {
             throw new IllegalArgumentException("Cannot delete a course that has enrollments");
         }

@@ -3,18 +3,39 @@ package com.lms.repository;
 import com.lms.entity.Course;
 import com.lms.entity.Enrollment;
 import com.lms.entity.User;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
+public interface EnrollmentRepository extends JpaRepository<Enrollment, Long>, JpaSpecificationExecutor<Enrollment> {
+
+    /** Dynamic filter specification — avoids passing null enum to PostgreSQL prepared statement. */
+    static Specification<Enrollment> withFilters(Enrollment.Status status, Long courseId, Long studentId) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+            if (courseId != null) {
+                predicates.add(cb.equal(root.get("course").get("id"), courseId));
+            }
+            if (studentId != null) {
+                predicates.add(cb.equal(root.get("student").get("id"), studentId));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
 
     Optional<Enrollment> findByStudentAndCourseAndStatusIn(User student, Course course, List<Enrollment.Status> statuses);
 
@@ -24,18 +45,8 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     Page<Enrollment> findAllByStudent(User student, Pageable pageable);
 
-    @Query("""
-            SELECT e FROM Enrollment e
-            WHERE (:status IS NULL OR e.status = :status)
-              AND (:courseId IS NULL OR e.course.id = :courseId)
-              AND (:studentId IS NULL OR e.student.id = :studentId)
-            """)
-    Page<Enrollment> findAllWithFilters(
-            @Param("status") Enrollment.Status status,
-            @Param("courseId") Long courseId,
-            @Param("studentId") Long studentId,
-            Pageable pageable
-    );
+    // findAllWithFilters removed — use Specification<Enrollment> withFilters(...) + findAll(Specification, Pageable) instead
+    // to avoid PostgreSQL "could not determine data type of parameter $1" error with null enum params.
 
     @Query("""
             SELECT e FROM Enrollment e
