@@ -41,7 +41,8 @@ public class EnrollmentController {
             Authentication authentication
     ) throws Exception {
         User user = requireUser(authentication);
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        int safeSize = Math.min(size, 20);
+        Pageable pageable = PageRequest.of(page, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
         try {
             if (user.getRole() == User.Role.STUDENT) {
                 return ResponseEntity.ok(enrollmentService.listForStudent(user, pageable));

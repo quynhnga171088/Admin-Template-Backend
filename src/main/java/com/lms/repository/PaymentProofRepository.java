@@ -5,6 +5,7 @@ import com.lms.entity.PaymentProof;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -13,4 +14,7 @@ public interface PaymentProofRepository extends JpaRepository<PaymentProof, Long
     Optional<PaymentProof> findByEnrollment(Enrollment enrollment);
 
     boolean existsByEnrollment(Enrollment enrollment);
+
+    List<PaymentProof> findAllByEnrollmentIn(List<Enrollment> enrollments);
 }
+

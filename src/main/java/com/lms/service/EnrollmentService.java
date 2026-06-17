@@ -15,17 +15,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class EnrollmentService {
 
-    private final EnrollmentRepository      enrollmentRepository;
-    private final CourseRepository          courseRepository;
-    private final LessonRepository          lessonRepository;
-    private final LessonProgressRepository  lessonProgressRepository;
-    private final PaymentProofRepository    paymentProofRepository;
-    private final FileStorageService        fileStorageService;
+    private final EnrollmentRepository enrollmentRepository;
+    private final CourseRepository courseRepository;
+    private final LessonRepository lessonRepository;
+    private final LessonProgressRepository lessonProgressRepository;
+    private final PaymentProofRepository paymentProofRepository;
+    private final FileStorageService fileStorageService;
 
     // ──────────────────────────────────────────────────────────────
     // List
@@ -34,18 +35,36 @@ public class EnrollmentService {
     /** STUDENT: own enrollments + progress per course */
     @Transactional(readOnly = true)
     public Page<EnrollmentResponse> listForStudent(User student, Pageable pageable) {
-        return enrollmentRepository.findAllByStudent(student, pageable)
-                .map(e -> buildResponseWithProgress(e, student));
+        Page<Enrollment> page = enrollmentRepository.findAllByStudent(student, pageable);
+        Map<Long, PaymentProof> proofMap = buildProofMap(page.getContent());
+
+        return page.map(e -> {
+            EnrollmentResponse res = EnrollmentResponse.fromEntity(e);
+            if (proofMap.containsKey(e.getId())) {
+                res.setPaymentProof(PaymentProofResponse.fromEntity(proofMap.get(e.getId())));
+            }
+            populateProgress(res, e, student);
+            return res;
+        });
     }
 
     /** ADMIN: all enrollments with filter */
     @Transactional(readOnly = true)
-    public Page<EnrollmentResponse> listForAdmin(Enrollment.Status status, Long courseId,
-                                                  Long studentId, Pageable pageable) {
-        return enrollmentRepository.findAll(
-                        EnrollmentRepository.withFilters(status, courseId, studentId), pageable)
-                .map(EnrollmentResponse::fromEntity);
+    public Page<EnrollmentResponse> listForAdmin(Enrollment.Status status, Long courseId, Long studentId,
+            Pageable pageable) {
+        Page<Enrollment> page = enrollmentRepository
+                .findAll(EnrollmentRepository.withFilters(status, courseId, studentId), pageable);
+        Map<Long, PaymentProof> proofMap = buildProofMap(page.getContent());
+
+        return page.map(e -> {
+            EnrollmentResponse res = EnrollmentResponse.fromEntity(e);
+            if (proofMap.containsKey(e.getId())) {
+                res.setPaymentProof(PaymentProofResponse.fromEntity(proofMap.get(e.getId())));
+            }
+            return res;
+        });
     }
+
 
     @Transactional(readOnly = true)
     public EnrollmentResponse getById(Long id, User currentUser) {
@@ -57,12 +76,12 @@ public class EnrollmentService {
         EnrollmentResponse res = EnrollmentResponse.fromEntity(enrollment);
 
         // Attach payment proof if any
-        paymentProofRepository.findByEnrollment(enrollment)
+        paymentProofRepository
+                .findByEnrollment(enrollment)
                 .ifPresent(p -> res.setPaymentProof(PaymentProofResponse.fromEntity(p)));
 
         // Attach progress for STUDENT viewing own enrollment
-        if (currentUser.getRole() == User.Role.STUDENT
-                && enrollment.getStudent().getId().equals(currentUser.getId())) {
+        if (currentUser.getRole() == User.Role.STUDENT && enrollment.getStudent().getId().equals(currentUser.getId())) {
             populateProgress(res, enrollment, currentUser);
         }
 
@@ -169,20 +188,17 @@ public class EnrollmentService {
         return EnrollmentResponse.fromEntity(enrollmentRepository.save(enrollment));
     }
 
-    // ──────────────────────────────────────────────────────────────
-    // Helpers
-    // ──────────────────────────────────────────────────────────────
+    /* Helpers */
 
-    private EnrollmentResponse buildResponseWithProgress(Enrollment e, User student) {
-        EnrollmentResponse res = EnrollmentResponse.fromEntity(e);
-
-        // Attach payment proof
-        paymentProofRepository.findByEnrollment(e)
-                .ifPresent(p -> res.setPaymentProof(PaymentProofResponse.fromEntity(p)));
-
-        // Attach progress
-        populateProgress(res, e, student);
-        return res;
+    /** Build an enrollment-ID → PaymentProof map using a single batch query. */
+    private Map<Long, PaymentProof> buildProofMap(List<Enrollment> enrollments) {
+        if (enrollments.isEmpty()) return Map.of();
+        return paymentProofRepository.findAllByEnrollmentIn(enrollments)
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        p -> p.getEnrollment().getId(),
+                        p -> p
+                ));
     }
 
     private void populateProgress(EnrollmentResponse res, Enrollment e, User student) {
@@ -197,8 +213,10 @@ public class EnrollmentService {
     }
 
     private void checkReadAccess(Enrollment enrollment, User user) {
-        if (user.getRole() == User.Role.ADMIN) return;
-        if (enrollment.getStudent().getId().equals(user.getId())) return;
+        if (user.getRole() == User.Role.ADMIN)
+            return;
+        if (enrollment.getStudent().getId().equals(user.getId()))
+            return;
         throw new SecurityException("Access denied");
     }
 }

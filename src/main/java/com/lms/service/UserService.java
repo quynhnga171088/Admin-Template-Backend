@@ -2,14 +2,18 @@ package com.lms.service;
 
 import com.lms.entity.User;
 import com.lms.repository.UserRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +29,22 @@ public class UserService {
     }
 
     public Page<User> listUsers(User.Role role, User.Status status, String search, Pageable pageable) {
-        String q = (search == null || search.isBlank()) ? null : search.trim();
-        return userRepository.findAllWithFilters(role, status, q, pageable);
+        String q = (search == null || search.isBlank()) ? null : search.trim().toLowerCase();
+        Specification<User> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.isNull(root.get("deletedAt")));
+            if (role != null) predicates.add(cb.equal(root.get("role"), role));
+            if (status != null) predicates.add(cb.equal(root.get("status"), status));
+            if (q != null) {
+                String pattern = "%" + q + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("email")), pattern),
+                        cb.like(cb.lower(root.get("fullName")), pattern)
+                ));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+        return userRepository.findAll(spec, pageable);
     }
 
     @Transactional

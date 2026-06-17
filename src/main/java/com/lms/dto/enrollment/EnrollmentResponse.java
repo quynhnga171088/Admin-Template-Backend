@@ -19,7 +19,7 @@ public class EnrollmentResponse {
     // Course info
     private Long courseId;
     private String courseTitle;
-    private String courseSlug;
+    private String courseShortDescription;
     private String courseThumbnailUrl;
     private BigDecimal coursePrice;
 
@@ -27,6 +27,8 @@ public class EnrollmentResponse {
     private Long studentId;
     private String studentName;
     private String studentEmail;
+    private String studentPhone;
+    private String studentAvatar;
 
     private Enrollment.Status status;
     private String note;
@@ -34,25 +36,28 @@ public class EnrollmentResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Progress (populated for STUDENT's own listing)
+    /* Progress (populated for STUDENT's own listing) */
     private Double progressPercent;
     private Integer completedLessons;
     private Integer totalLessons;
 
-    // Payment proof (if uploaded)
+    /* Payment proof (if uploaded) */
     private PaymentProofResponse paymentProof;
 
     public static EnrollmentResponse fromEntity(Enrollment e) {
-        return EnrollmentResponse.builder()
+        return EnrollmentResponse
+                .builder()
                 .id(e.getId())
                 .courseId(e.getCourse().getId())
                 .courseTitle(e.getCourse().getTitle())
-                .courseSlug(e.getCourse().getSlug())
+                .courseShortDescription(e.getCourse().getShortDescription())
                 .courseThumbnailUrl(e.getCourse().getThumbnailUrl())
                 .coursePrice(e.getCourse().getPrice())
                 .studentId(e.getStudent().getId())
                 .studentName(e.getStudent().getFullName())
                 .studentEmail(e.getStudent().getEmail())
+                .studentPhone(e.getStudent().getPhone())
+                .studentAvatar(e.getStudent().getAvatarUrl())
                 .status(e.getStatus())
                 .note(e.getNote())
                 .reviewedAt(e.getReviewedAt())
