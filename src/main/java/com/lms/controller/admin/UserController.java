@@ -95,12 +95,11 @@ public class UserController {
         return ResponseEntity.ok(UserResponse.fromEntity(updated));
     }
     /**
-     * Đổi mật khẩu của chính mình (Teacher / Admin).
-     * User được lấy từ JWT principal — không truyền userId để tránh IDOR.
-     *
+     * Change your own password (Teacher / Admin).
+     * User is retrieved from JWT principal — userId is not passed to avoid IDOR.
      * PATCH /admin/users/password
      * Body: { "currentPassword": "...", "newPassword": "...", "confirmPassword": "..." }
-     * Response: 204 No Content → Frontend tự logout và redirect về /login.
+     * Response: 204 No Content → Frontend automatically logs out and redirects to /login.
      */
     @PatchMapping("/password")
     public ResponseEntity<Void> changePassword(
