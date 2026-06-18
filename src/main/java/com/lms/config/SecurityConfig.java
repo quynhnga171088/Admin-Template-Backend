@@ -72,7 +72,9 @@ public class SecurityConfig {
                         // Bank info is shown on the student payment page — public read
                         .requestMatchers(HttpMethod.GET, "/admin/config/bank-info").permitAll()
                         // Update information for Teacher and Admin system
-                        .requestMatchers(HttpMethod.PUT, "/admin/users/info/{userId}").hasAnyRole("TEACHER", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/admin/users/info/{userId}").hasAnyRole("TEACHER", "ADMIN")
+                        // Change own password (Teacher & Admin)
+                        .requestMatchers(HttpMethod.PATCH, "/admin/users/password").hasAnyRole("TEACHER", "ADMIN")
                         // Course report accessible to teacher who owns the course (checked in service)
                         .requestMatchers(HttpMethod.GET, "/admin/reports/courses/{courseId}").hasAnyRole("TEACHER", "ADMIN")
                         // All other admin routes require ADMIN role

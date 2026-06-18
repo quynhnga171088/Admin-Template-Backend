@@ -115,4 +115,45 @@ public class UserService {
         userRepository.save(user);
         refreshTokenService.revokeAllUserTokens(user);
     }
+
+    /**
+     * Cho phép Teacher / Admin tự đổi mật khẩu của mình.
+     *
+     * Quy trình bảo mật:
+     *  1. Xác minh currentPassword khớp với hash trong DB.
+     *  2. Kiểm tra confirmPassword == newPassword.
+     *  3. Kiểm tra newPassword ≠ currentPassword (tránh đổi sang cùng giá trị).
+     *  4. Lưu hash mới vào DB.
+     *  5. Revoke toàn bộ refresh token → buộc đăng xuất tất cả thiết bị.
+     *
+     * @param user            user hiện tại (lấy từ JWT principal)
+     * @param currentPassword mật khẩu cũ để xác minh danh tính
+     * @param newPassword     mật khẩu mới (đã validate độ dài ở DTO layer)
+     * @param confirmPassword phải khớp với newPassword
+     */
+    @Transactional
+    public void changePassword(User user, String currentPassword, String newPassword, String confirmPassword) {
+        // 1. Xác minh mật khẩu hiện tại
+        if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        // 2. Xác nhận mật khẩu mới khớp nhau
+        if (!newPassword.equals(confirmPassword)) {
+            throw new IllegalArgumentException("New password and confirm password do not match");
+        }
+
+        // 3. Không cho phép đổi sang cùng mật khẩu cũ
+        if (passwordEncoder.matches(newPassword, user.getPasswordHash())) {
+            throw new IllegalArgumentException("New password must be different from the current password");
+        }
+
+        // 4. Cập nhật hash mới
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        // 5. Revoke tất cả refresh tokens → buộc đăng xuất toàn bộ thiết bị
+        refreshTokenService.revokeAllUserTokens(user);
+    }
 }
+

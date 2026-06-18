@@ -1,6 +1,7 @@
 package com.lms.controller.admin;
 
 import com.lms.dto.admin.AdminUserDetailResponse;
+import com.lms.dto.admin.ChangePasswordRequest;
 import com.lms.dto.admin.CreateTeacherRequest;
 import com.lms.dto.admin.EnrollmentSummaryResponse;
 import com.lms.dto.admin.UpdateUserAdminRequest;
@@ -16,7 +17,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -73,12 +76,10 @@ public class UserController {
     }
 
     /**
-     * Cập nhật thông tin cá nhân của Teacher / Admin.
-     * Chỉ các trường được gửi lên (khác null) mới được cập nhật.
-     *
-     * POST /admin/users/info/{userId}
+     * Update information for Teacher & Admin.
+     * Only fields that are sent (non-null) will be updated.
+     * PATCH /admin/users/info/{userId}
      * Content-Type: application/json
-     *
      * Body:
      *   { "fullName": "...", "phone": "...", "avatarUrl": "..." }
      */
@@ -92,5 +93,24 @@ public class UserController {
                 req.getPhone(),
                 req.getAvatarUrl());
         return ResponseEntity.ok(UserResponse.fromEntity(updated));
+    }
+    /**
+     * Đổi mật khẩu của chính mình (Teacher / Admin).
+     * User được lấy từ JWT principal — không truyền userId để tránh IDOR.
+     *
+     * PATCH /admin/users/password
+     * Body: { "currentPassword": "...", "newPassword": "...", "confirmPassword": "..." }
+     * Response: 204 No Content → Frontend tự logout và redirect về /login.
+     */
+    @PatchMapping("/password")
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal User currentUser,
+            @Valid @RequestBody ChangePasswordRequest req) {
+        userService.changePassword(
+                currentUser,
+                req.getCurrentPassword(),
+                req.getNewPassword(),
+                req.getConfirmPassword());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
