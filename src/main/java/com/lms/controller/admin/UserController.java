@@ -4,6 +4,7 @@ import com.lms.dto.admin.AdminUserDetailResponse;
 import com.lms.dto.admin.CreateTeacherRequest;
 import com.lms.dto.admin.EnrollmentSummaryResponse;
 import com.lms.dto.admin.UpdateUserAdminRequest;
+import com.lms.dto.admin.UpdateUserInfoRequest;
 import com.lms.dto.user.UserResponse;
 import com.lms.entity.Enrollment;
 import com.lms.entity.User;
@@ -34,8 +35,7 @@ public class UserController {
             @RequestParam(required = false) User.Status status,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<UserResponse> res = userService.listUsers(role, status, search, pageable).map(UserResponse::fromEntity);
         return ResponseEntity.ok(res);
@@ -51,8 +51,7 @@ public class UserController {
                 AdminUserDetailResponse.builder()
                         .user(UserResponse.fromEntity(user))
                         .recentEnrollments(recentRes)
-                        .build()
-        );
+                        .build());
     }
 
     @PostMapping
@@ -72,5 +71,26 @@ public class UserController {
         userService.softDelete(id);
         return ResponseEntity.noContent().build();
     }
-}
 
+    /**
+     * Cập nhật thông tin cá nhân của Teacher / Admin.
+     * Chỉ các trường được gửi lên (khác null) mới được cập nhật.
+     *
+     * POST /admin/users/info/{userId}
+     * Content-Type: application/json
+     *
+     * Body:
+     *   { "fullName": "...", "phone": "...", "avatarUrl": "..." }
+     */
+    @PatchMapping("/info/{userId}")
+    public ResponseEntity<UserResponse> updateUserInfo(
+            @PathVariable Long userId,
+            @Valid @RequestBody UpdateUserInfoRequest req) {
+        User updated = userService.updateUserInfo(
+                userId,
+                req.getFullName(),
+                req.getPhone(),
+                req.getAvatarUrl());
+        return ResponseEntity.ok(UserResponse.fromEntity(updated));
+    }
+}

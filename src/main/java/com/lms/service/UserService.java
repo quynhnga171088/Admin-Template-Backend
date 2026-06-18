@@ -33,14 +33,15 @@ public class UserService {
         Specification<User> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.isNull(root.get("deletedAt")));
-            if (role != null) predicates.add(cb.equal(root.get("role"), role));
-            if (status != null) predicates.add(cb.equal(root.get("status"), status));
+            if (role != null)
+                predicates.add(cb.equal(root.get("role"), role));
+            if (status != null)
+                predicates.add(cb.equal(root.get("status"), status));
             if (q != null) {
                 String pattern = "%" + q + "%";
                 predicates.add(cb.or(
                         cb.like(cb.lower(root.get("email")), pattern),
-                        cb.like(cb.lower(root.get("fullName")), pattern)
-                ));
+                        cb.like(cb.lower(root.get("fullName")), pattern)));
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
@@ -62,6 +63,34 @@ public class UserService {
                 .role(User.Role.TEACHER)
                 .status(User.Status.ACTIVE)
                 .build();
+        return userRepository.save(user);
+    }
+
+    /**
+     * Cập nhật thông tin cá nhân của Teacher / Admin.
+     * Chỉ các trường khác null mới được cập nhật (partial update).
+     *
+     * @param id        ID của user cần cập nhật
+     * @param fullName  tên đầy đủ mới (null → giữ nguyên)
+     * @param phone     số điện thoại mới (null → giữ nguyên, "" → xóa)
+     * @param avatarUrl URL avatar mới (null → giữ nguyên, "" → xóa)
+     */
+    @Transactional
+    public User updateUserInfo(Long id, String fullName, String phone, String avatarUrl) {
+        User user = getByIdOrThrow(id);
+
+        if (fullName != null && !fullName.isBlank()) {
+            user.setFullName(fullName.trim());
+        }
+
+        if (phone != null) {
+            user.setPhone(phone.isBlank() ? null : phone.trim());
+        }
+
+        if (avatarUrl != null) {
+            user.setAvatarUrl(avatarUrl.isBlank() ? null : avatarUrl.trim());
+        }
+
         return userRepository.save(user);
     }
 
@@ -87,4 +116,3 @@ public class UserService {
         refreshTokenService.revokeAllUserTokens(user);
     }
 }
-
