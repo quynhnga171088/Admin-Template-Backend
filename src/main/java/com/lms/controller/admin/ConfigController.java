@@ -37,13 +37,14 @@ public class ConfigController {
     }
 
     /** ADMIN: update a single config key's value */
-    @PatchMapping
+    @PatchMapping("/{key}")
     public ResponseEntity<ConfigResponse> update(
+            @PathVariable String key,
             @Valid @RequestBody UpdateConfigRequest req,
             Authentication authentication
     ) {
         User admin = requireUser(authentication);
-        SystemConfig updated = systemConfigService.updateValue(req.getKey(), req.getValue(), admin);
+        SystemConfig updated = systemConfigService.updateValue(key, req.getValue(), admin);
         return ResponseEntity.ok(ConfigResponse.fromEntity(updated));
     }
 
