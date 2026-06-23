@@ -76,8 +76,7 @@ public class ConfigController {
         BankInfo saved = bankInfoRepository.save(bank);
         return ResponseEntity.ok(BankInfoResponse.fromEntity(saved));
     }
-
-    // ──────────────────────────────────────────────────────────────
+    
     private User requireUser(Authentication auth) {
         if (auth != null && auth.getPrincipal() instanceof User u) return u;
         throw new SecurityException("Unauthorized");
