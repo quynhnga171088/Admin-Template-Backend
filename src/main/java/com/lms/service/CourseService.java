@@ -26,6 +26,8 @@ public class CourseService {
     private final LessonRepository          lessonRepository;
     private final EnrollmentRepository      enrollmentRepository;
     private final LessonProgressRepository  lessonProgressRepository;
+    private final CategoryRepository        categoryRepository;
+    private final LevelRepository           levelRepository;
 
     // ──────────────────────────────────────────────────────────────
     // Retrieval
@@ -101,6 +103,10 @@ public class CourseService {
                 .publishedAt(course.getPublishedAt())
                 .createdAt(course.getCreatedAt())
                 .enrollmentStatus(enrollmentStatus)
+                .categoryId(course.getCategory() != null ? course.getCategory().getId() : null)
+                .categoryName(course.getCategory() != null ? course.getCategory().getCategoryName() : null)
+                .levelId(course.getLevel() != null ? course.getLevel().getId() : null)
+                .levelName(course.getLevel() != null ? course.getLevel().getLevelName() : null)
                 .lessons(lessonResponses)
                 .build();
     }
@@ -113,6 +119,12 @@ public class CourseService {
     public Course createCourse(CreateCourseRequest req, User creator) {
         String slug = generateUniqueSlug(req.getTitle());
 
+        Category category = categoryRepository.findById(req.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", req.getCategoryId()));
+
+        Level level = levelRepository.findById(req.getLevelId())
+                .orElseThrow(() -> new ResourceNotFoundException("Level", req.getLevelId()));
+
         Course course = Course.builder()
                 .title(req.getTitle())
                 .slug(slug)
@@ -123,6 +135,8 @@ public class CourseService {
                 .status(Course.Status.DRAFT)
                 .teacher(creator)
                 .createdBy(creator)
+                .category(category)
+                .level(level)
                 .build();
 
         return courseRepository.save(course);
@@ -144,6 +158,14 @@ public class CourseService {
             }
             course.setStatus(req.getStatus());
         }
+
+        Category category = categoryRepository.findById(req.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", req.getCategoryId()));
+        course.setCategory(category);
+
+        Level level = levelRepository.findById(req.getLevelId())
+                .orElseThrow(() -> new ResourceNotFoundException("Level", req.getLevelId()));
+        course.setLevel(level);
 
         return courseRepository.save(course);
     }

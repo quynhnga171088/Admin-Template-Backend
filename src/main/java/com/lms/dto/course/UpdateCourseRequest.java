@@ -2,6 +2,7 @@ package com.lms.dto.course;
 
 import com.lms.entity.Course;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -27,4 +28,10 @@ public class UpdateCourseRequest {
 
     /** DRAFT → PUBLISHED | ARCHIVED */
     private Course.Status status;
+
+    @NotNull(message = "categoryId is required")
+    private Long categoryId;
+
+    @NotNull(message = "levelId is required")
+    private Long levelId;
 }

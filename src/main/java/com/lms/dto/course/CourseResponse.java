@@ -26,6 +26,10 @@ public class CourseResponse {
     private long lessonCount;
     private LocalDateTime publishedAt;
     private LocalDateTime createdAt;
+    private Long categoryId;
+    private String categoryName;
+    private Long levelId;
+    private String levelName;
 
     /** Only populated when the requesting user is an authenticated STUDENT */
     private Enrollment.Status enrollmentStatus;
@@ -44,6 +48,10 @@ public class CourseResponse {
                 .publishedAt(c.getPublishedAt())
                 .createdAt(c.getCreatedAt())
                 .enrollmentStatus(enrollmentStatus)
+                .categoryId(c.getCategory() != null ? c.getCategory().getId() : null)
+                .categoryName(c.getCategory() != null ? c.getCategory().getCategoryName() : null)
+                .levelId(c.getLevel() != null ? c.getLevel().getId() : null)
+                .levelName(c.getLevel() != null ? c.getLevel().getLevelName() : null)
                 .build();
     }
 }

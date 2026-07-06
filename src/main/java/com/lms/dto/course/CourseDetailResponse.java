@@ -28,6 +28,10 @@ public class CourseDetailResponse {
     private TeacherInfo teacher;
     private LocalDateTime publishedAt;
     private LocalDateTime createdAt;
+    private Long categoryId;
+    private String categoryName;
+    private Long levelId;
+    private String levelName;
 
     /** Enrollment status of the requesting student (null if not authenticated or not student) */
     private Enrollment.Status enrollmentStatus;

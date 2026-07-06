@@ -2,6 +2,7 @@ package com.lms.dto.course;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -25,4 +26,10 @@ public class CreateCourseRequest {
 
     @DecimalMin("0")
     private BigDecimal price = BigDecimal.ZERO;
+
+    @NotNull(message = "categoryId is required")
+    private Long categoryId;
+
+    @NotNull(message = "levelId is required")
+    private Long levelId;
 }

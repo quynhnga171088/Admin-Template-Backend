@@ -67,6 +67,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/courses", "/courses/{courseId}").permitAll()
                         // Lesson list is public (preview); controller decides detail level based on auth
                         .requestMatchers(HttpMethod.GET, "/courses/{courseId}/lessons").permitAll()
+                        // Category and Level lists are public (used in course create/edit select boxes)
+                        .requestMatchers(HttpMethod.GET, "/categories").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/levels").permitAll()
                         // Static file serving (Range-request-aware via WebMvcConfig resource handler)
                         .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                         // Bank info is shown on the student payment page — public read
