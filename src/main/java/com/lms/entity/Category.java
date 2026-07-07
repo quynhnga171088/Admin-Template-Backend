@@ -26,6 +26,10 @@ public class Category {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "avatar", length = 50)
+    private String avatar;
+
+
     @Column(name = "created_date", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdDate = LocalDateTime.now();
