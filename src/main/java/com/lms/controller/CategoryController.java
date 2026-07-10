@@ -6,12 +6,18 @@ import com.lms.dto.category.UpdateCategoryRequest;
 import com.lms.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
@@ -20,9 +26,22 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     /** Public — returns all active categories for dropdown/select. */
+    @GetMapping("/home")
+    public ResponseEntity<List<CategoryResponse>> getCategoriesForHomePage() {
+        return ResponseEntity.ok(categoryService.getCategoriesForHomePage());
+    }
+
+    /** Admin — returns paginated categories with optional search. */
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> listAll() {
-        return ResponseEntity.ok(categoryService.listAll());
+    public ResponseEntity<Page<CategoryResponse>> listAll(
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "id") String sortBy
+    ) {
+        log.debug("[listAll] search='{}', page={}, size={}, sortBy={}", search, page, size, sortBy);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy));
+        return ResponseEntity.ok(categoryService.listPaginated(search, pageable));
     }
 
     @GetMapping("/{id}")
@@ -37,7 +56,7 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponse> update(@PathVariable Long id,
-                                                   @Valid @RequestBody UpdateCategoryRequest request) {
+            @Valid @RequestBody UpdateCategoryRequest request) {
         return ResponseEntity.ok(categoryService.update(id, request));
     }
 
