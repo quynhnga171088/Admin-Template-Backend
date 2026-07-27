@@ -9,7 +9,7 @@ import org.hibernate.annotations.Where;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "sections")
+@Table(name = "sections", schema = "public")
 @Where(clause = "deleted_at IS NULL")
 @Getter
 @Setter

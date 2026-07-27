@@ -7,7 +7,7 @@ spring:
   # ─────────────────────────────────────────
   datasource:
     # Local dev: match docker-compose.yml service `postgres` (port 5432 on host)
-    url: jdbc:postgresql://127.0.0.1:5432/lms_db
+    url: jdbc:postgresql://127.0.0.1:5432/lms_db?currentSchema=public,api
     username: lms_user
     password: lms_password
     driver-class-name: org.postgresql.Driver
@@ -20,6 +20,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        default_schema: public
 
   # ─────────────────────────────────────────
   # Flyway
@@ -52,7 +53,7 @@ server:
 app:
   jwt:
     secret: "VGhpc0lzQURldlNlY3JldEtleUZvckxNUzIwMjZQbGF0Zm9ybUJhY2tlbmRNdXN0QmUyNTZCaXRzT3JNb3JlISE="
-    expiration-ms: 900000        # 15 minutes
+    expiration-ms: 900000 # 15 minutes
   refresh-token:
     expiration-days: 30
   storage:

@@ -7,7 +7,7 @@ import org.hibernate.annotations.Where;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "categories", schema = "public")
 @Where(clause = "deleted_date IS NULL")
 @Getter
 @Setter
@@ -28,7 +28,6 @@ public class Category {
 
     @Column(name = "avatar", length = 50)
     private String avatar;
-
 
     @Column(name = "created_date", nullable = false, updatable = false)
     @Builder.Default

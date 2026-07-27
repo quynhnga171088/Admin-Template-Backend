@@ -40,8 +40,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(
             UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder
-    ) {
+            PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
@@ -53,9 +52,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Public auth endpoints
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
@@ -65,13 +62,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
                         // Public course catalog
                         .requestMatchers(HttpMethod.GET, "/courses", "/courses/{courseId}").permitAll()
-                        // Lesson list is public (preview); controller decides detail level based on auth
+                        // Lesson list is public (preview); controller decides detail level based on
+                        // auth
                         .requestMatchers(HttpMethod.GET, "/courses/{courseId}/lessons").permitAll()
                         // Category and Level lists are public (used in course create/edit select boxes)
                         .requestMatchers(HttpMethod.GET, "/categories").permitAll()
                         .requestMatchers(HttpMethod.GET, "/levels").permitAll()
                         // Static file serving (Range-request-aware via WebMvcConfig resource handler)
                         .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         // Bank info is shown on the student payment page — public read
                         .requestMatchers(HttpMethod.GET, "/admin/config/bank-info").permitAll()
                         // Update information for Teacher and Admin system
@@ -79,12 +78,12 @@ public class SecurityConfig {
                         // Change own password (Teacher & Admin)
                         .requestMatchers(HttpMethod.PATCH, "/admin/users/password").hasAnyRole("TEACHER", "ADMIN")
                         // Course report accessible to teacher who owns the course (checked in service)
-                        .requestMatchers(HttpMethod.GET, "/admin/reports/courses/{courseId}").hasAnyRole("TEACHER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/admin/reports/courses/{courseId}")
+                        .hasAnyRole("TEACHER", "ADMIN")
                         // All other admin routes require ADMIN role
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         // All other requests require authentication
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -93,15 +92,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // JWT in Authorization header — no cookies; 127.0.0.1 and localhost are different browser origins
+        // JWT in Authorization header — no cookies; 127.0.0.1 and localhost are
+        // different browser origins
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:5173",
                 "http://localhost:5174",
                 "http://127.0.0.1:5173",
                 "http://127.0.0.1:5174",
                 "http://localhost:5175",
-                "http://127.0.0.1:5175"
-        ));
+                "http://127.0.0.1:5175"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(false);
