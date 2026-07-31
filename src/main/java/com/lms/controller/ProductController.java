@@ -54,8 +54,17 @@ public class ProductController {
             Sort.Direction direction = Sort.Direction.fromOptionalString(req.getSortDir())
                     .orElse(Sort.Direction.DESC);
 
-            Pageable pageable = PageRequest.of(req.getPage(), req.getSize(),
-                    Sort.by(direction, req.getSortBy()));
+            // Always add `id` as a stable secondary sort (tiebreaker) to prevent
+            // duplicate rows across pages when multiple products share the same primary
+            // sort value (e.g. identical createdAt timestamps). Without a tiebreaker,
+            // PostgreSQL's OFFSET-based pagination is non-deterministic and can return
+            // the same row on both page 0 and page 1.
+            // Guard: skip adding the tiebreaker when sortBy=id to avoid a conflicting
+            // ORDER BY id DESC, id ASC on the same column.
+            Sort sort = "id".equalsIgnoreCase(req.getSortBy())
+                    ? Sort.by(direction, req.getSortBy())
+                    : Sort.by(direction, req.getSortBy()).and(Sort.by(Sort.Direction.ASC, "id"));
+            Pageable pageable = PageRequest.of(req.getPage(), req.getSize(), sort);
 
             Page<ProductResponse> page = productService.listProducts(req.getSearch(), req.getStatus(), req.getCategoryKey(), pageable);
 
